@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -28,13 +29,16 @@ public class Board extends BaseEntity {
     private String content;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private Member writer;
+    private Member writer; //회원과의 연관 관계
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "board")
     private Set<BoardFile> fileSet;
 
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "board")
+    private Set<BoardReply> replySet;
 
-    public void setWriterWithMno(Long mno) {
+    public void setWriterWithMno(Long mno){
+
         this.writer = Member.builder().mno(mno).build();
     }
 }

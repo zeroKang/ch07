@@ -16,11 +16,13 @@ public class BoardFile extends BaseEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long bno;
+    private Long fno;
 
     @Column(nullable = false)
     private String fname;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Board board;
+
+
 }

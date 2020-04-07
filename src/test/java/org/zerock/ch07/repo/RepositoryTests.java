@@ -9,10 +9,14 @@ import org.springframework.data.domain.Sort;
 import org.springframework.test.annotation.Commit;
 import org.zerock.ch07.entity.Board;
 import org.zerock.ch07.entity.BoardFile;
+import org.zerock.ch07.entity.BoardReply;
 import org.zerock.ch07.entity.Member;
 
 import javax.transaction.Transactional;
-import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @SpringBootTest
@@ -28,6 +32,9 @@ public class RepositoryTests {
     @Autowired
     private BoardFileRepository fileRepository;
 
+    @Autowired
+    private BoardReplyRepository replyRepository;
+
     @Test
     @Commit
     public void testInsertMembers() {
@@ -37,7 +44,6 @@ public class RepositoryTests {
             System.out.println(memberRepository.save(member));
         });
     }
-
 
     @Test
     @Commit
@@ -51,10 +57,11 @@ public class RepositoryTests {
         });
     }
 
+
     @Test
     public void testReadBoard() {
 
-        Board board = boardRepository.findById(10L).get();
+        Board board = boardRepository.findById(100L).get();
 
         System.out.println(board);
         System.out.println("--------------------------");
@@ -64,8 +71,6 @@ public class RepositoryTests {
         System.out.println(board.getWriter());
 
     }
-
-
 
     @Test
     @Commit
@@ -109,29 +114,6 @@ public class RepositoryTests {
     }
 
     @Test
-    public void testBoardPaging() {
-
-        Sort sort = Sort.by("bno").descending();
-
-        PageRequest pageRequest = PageRequest.of(0,20,sort);
-
-        Page<Board> result = boardRepository.findAll(pageRequest);
-
-        System.out.println(result);
-
-        System.out.println("-----------------------------");
-
-        result.getContent().forEach(board -> {
-            System.out.print(board.getBno());
-            System.out.print(board.getTitle());
-            System.out.print(board.getWriter().getMname());
-            System.out.println(board.getFileSet());
-            System.out.println("----------------------------------");
-        });
-
-    }
-
-    @Test
     public void testBoardPagingEntityGraph(){
 
         Sort sort = Sort.by("bno").descending();
@@ -148,13 +130,66 @@ public class RepositoryTests {
             System.out.print(board.getBno() +"\t");
             System.out.print(board.getTitle() + "\t");
             System.out.print(board.getWriter().getMname() +"\t");
-            System.out.print(board.getCreatedDate() +"\t");
+            System.out.print(board.getRegDate() +"\t");
             System.out.println(board.getFileSet() );
             System.out.println("----------------------------------");
         });
 
     }
 
+    @Test
+    @Commit
+    public void testAddReply(){
 
+        Board board = Board.builder().bno(100L).build();
+
+        IntStream.range(1, 11).forEach(i -> {
+
+            Member replyer = Member.builder().mno((long)i).build();
+
+            BoardReply reply = BoardReply.builder().replyText("Reply 100... " + i)
+                    .replyer(replyer)
+                    .board(board)
+                    .build();
+
+            replyRepository.save(reply);
+        });
+    }
+
+    @Test
+    public void testBoardPagingEntityGraphReply(){
+
+        Sort sort = Sort.by("bno").descending();
+
+        PageRequest pageRequest = PageRequest.of(5,20,sort);
+
+        Page<Board> result = boardRepository.getPage(pageRequest);
+
+        System.out.println(result);
+
+        System.out.println("-----------------------------");
+
+        result.getContent().forEach(board -> {
+            System.out.print(board.getBno() +"\t");
+            System.out.print(board.getTitle() + "\t");
+            System.out.print(board.getWriter().getMname() +"\t");
+            System.out.print(board.getRegDate() +"\t");
+            System.out.println(board.getFileSet() );
+
+            Set<BoardReply> replySet =  board.getReplySet();
+
+            List<BoardReply> replyList = replySet.stream().collect(Collectors.toList());
+
+            Collections.sort(replyList, (o1, o2) -> o1.getRno().compareTo(o2.getRno()));
+
+            for (BoardReply reply : replyList) {
+                System.out.println(reply.getRno() +" : " + reply.getReplyText());
+            }
+
+
+            System.out.println("----------------------------------");
+        });
+
+    }
 
 }
