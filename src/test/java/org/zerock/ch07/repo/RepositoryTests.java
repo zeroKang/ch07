@@ -65,19 +65,7 @@ public class RepositoryTests {
 
     }
 
-    @Test
-    public void testReadBoardWithFetch() {
 
-        Board board = boardRepository.getBoardWithFetch(10L);
-
-        System.out.println(board);
-        System.out.println("--------------------------");
-        System.out.println(board.getBno());
-        System.out.println(board.getTitle());
-        System.out.println(board.getContent());
-        System.out.println(board.getWriter());
-
-    }
 
     @Test
     @Commit
@@ -88,8 +76,6 @@ public class RepositoryTests {
         IntStream.range(1,5).forEach(i-> {
 
             BoardFile file = BoardFile.builder().fname("image"+ i +".jpg").board(board).build();
-
-            board.addFile(file);
 
             fileRepository.save(file);
         });
@@ -111,7 +97,7 @@ public class RepositoryTests {
     @Test
     public void testReadBoardWithFile2(){
 
-        Board board = boardRepository.getBoardAllWithFetch(10L);
+        Board board = boardRepository.getBoardAllWithFetch(100L);
 
         System.out.println(board.getBno());
         System.out.println(board.getTitle());
@@ -129,14 +115,41 @@ public class RepositoryTests {
 
         PageRequest pageRequest = PageRequest.of(0,20,sort);
 
-        Page<Object[]> result = boardRepository.getBoardAllWithFetch(pageRequest);
+        Page<Board> result = boardRepository.findAll(pageRequest);
 
         System.out.println(result);
 
         System.out.println("-----------------------------");
 
-        result.getContent().forEach(arr -> {
-            System.out.println(Arrays.toString(arr));
+        result.getContent().forEach(board -> {
+            System.out.print(board.getBno());
+            System.out.print(board.getTitle());
+            System.out.print(board.getWriter().getMname());
+            System.out.println(board.getFileSet());
+            System.out.println("----------------------------------");
+        });
+
+    }
+
+    @Test
+    public void testBoardPagingEntityGraph(){
+
+        Sort sort = Sort.by("bno").descending();
+
+        PageRequest pageRequest = PageRequest.of(0,20,sort);
+
+        Page<Board> result = boardRepository.getPage(pageRequest);
+
+        System.out.println(result);
+
+        System.out.println("-----------------------------");
+
+        result.getContent().forEach(board -> {
+            System.out.print(board.getBno() +"\t");
+            System.out.print(board.getTitle() + "\t");
+            System.out.print(board.getWriter().getMname() +"\t");
+            System.out.print(board.getCreatedDate() +"\t");
+            System.out.println(board.getFileSet() );
             System.out.println("----------------------------------");
         });
 

@@ -33,14 +33,6 @@ public class Board extends BaseEntity {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "board")
     private Set<BoardFile> fileSet;
 
-    public void addFile(BoardFile file){
-
-        if(this.fileSet == null){
-            this.fileSet = new HashSet<>();
-        }
-        fileSet.add(file);
-
-    }
 
     public void setWriterWithMno(Long mno) {
         this.writer = Member.builder().mno(mno).build();
