@@ -31,10 +31,10 @@ public class Board extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private Member writer; //회원과의 연관 관계
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "board")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "board" , cascade = CascadeType.ALL)
     private Set<BoardFile> fileSet;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "board")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "board", cascade = CascadeType.ALL)
     private Set<BoardReply> replySet;
 
     public void setWriterWithMno(Long mno){

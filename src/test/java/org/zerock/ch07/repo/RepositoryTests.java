@@ -161,7 +161,7 @@ public class RepositoryTests {
 
         Sort sort = Sort.by("bno").descending();
 
-        PageRequest pageRequest = PageRequest.of(5,20,sort);
+        PageRequest pageRequest = PageRequest.of(0,20,sort);
 
         Page<Board> result = boardRepository.getPage(pageRequest);
 
@@ -185,10 +185,16 @@ public class RepositoryTests {
             for (BoardReply reply : replyList) {
                 System.out.println(reply.getRno() +" : " + reply.getReplyText());
             }
-
-
             System.out.println("----------------------------------");
         });
+
+    }
+
+    @Test
+    @Commit
+    public void testDeleteCascade() {
+
+        boardRepository.deleteById(100L);
 
     }
 
